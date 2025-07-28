@@ -25,17 +25,8 @@ export interface FetchNotesResponse {
   total_pages: number;
 }
 
-interface RawNote {
-  id: number;
-  title: string;
-  content: string;
-  tag: NoteTag;
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface RawFetchNotesResponse {
-  notes: RawNote[];
+  notes: Note[];
   totalPages: number;
 }
 
@@ -57,11 +48,7 @@ export const fetchNotes = async ({
   return {
     page,
     perPage,
-    data: raw.notes.map((note) => ({
-      ...note,
-      createdAt: new Date(note.createdAt),
-      updatedAt: new Date(note.updatedAt),
-    })),
+    data: raw.notes,
     total_pages: raw.totalPages,
   };
 };
@@ -71,23 +58,11 @@ export const createNote = async (note: {
   content: string;
   tag: NoteTag;
 }): Promise<Note> => {
-  const response = await axios.post<RawNote>("/notes", note);
-  const data = response.data;
-
-  return {
-    ...data,
-    createdAt: new Date(data.createdAt),
-    updatedAt: new Date(data.updatedAt),
-  };
+  const response = await axios.post<Note>("/notes", note);
+  return response.data;
 };
 
 export const deleteNote = async (id: number): Promise<Note> => {
-  const response = await axios.delete<RawNote>(`/notes/${id}`);
-  const data = response.data;
-
-  return {
-    ...data,
-    createdAt: new Date(data.createdAt),
-    updatedAt: new Date(data.updatedAt),
-  };
+  const response = await axios.delete<Note>(`/notes/${id}`);
+  return response.data;
 };
